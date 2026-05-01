@@ -1,0 +1,57 @@
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local screenGui = script.Parent
+local itemList = screenGui:WaitForChild("ScrollingFrame")
+
+-- Our Shop Data (This could come from a ModuleScript)
+local ShopItems = {
+	{Name = "Iron Sword", Price = 50, Color = Color3.fromRGB(163, 162, 165)},
+	{Name = "Fire Staff", Price = 150, Color = Color3.fromRGB(255, 89, 89)},
+	{Name = "Void Bow", Price = 500, Color = Color3.fromRGB(123, 47, 190)}
+}
+
+-- Function to create buttons dynamically
+local function populateShop()
+	-- Clear existing list
+	for _, child in pairs(itemList:GetChildren()) do
+		if child:IsA("TextButton") then child:Destroy() end
+	end
+
+	for i, item in ipairs(ShopItems) do
+		local button = Instance.new("TextButton")
+		button.Name = item.Name
+		button.Size = UDim2.new(0.9, 0, 0, 50)
+		button.Position = UDim2.new(0.05, 0, 0, (i - 1) * 60)
+		button.BackgroundColor3 = item.Color
+		button.Text = item.Name .. " - $" .. item.Price
+		button.Font = Enum.Font.LuckiestGuy
+		button.TextSize = 20
+		button.Parent = itemList
+
+		-- UI ROUNDING (Corner design)
+		local corner = Instance.new("UICorner")
+		corner.CornerRadius = UDim.new(0, 8)
+		corner.Parent = button
+
+		-- INTERACTION: Hover Effect
+		button.MouseEnter:Connect(function()
+			button.BackgroundTransparency = 0.2
+			button.TextSize = 24 -- "Pop" effect
+		end)
+
+		button.MouseLeave:Connect(function()
+			button.BackgroundTransparency = 0
+			button.TextSize = 20
+		end)
+
+		-- INTERACTION: Click Logic
+		button.MouseButton1Click:Connect(function()
+			print("Attempting to buy: " .. item.Name)
+			-- Fire a RemoteEvent to the server here!
+			-- game.ReplicatedStorage.BuyItem:FireServer(item.Name)
+		end)
+	end
+end
+
+populateShop()
